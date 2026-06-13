@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+  
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Cafe ECU Caleb — Menu & Reservations</title>
+
+  <!-- Google fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- AOS for scroll animations -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <img src="assets/caleb cafe logo.jpg" alt="Cafe E" class="logo">
+      </div>
+
+      <nav class="nav" id="navbar">
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
+          <i class="fas fa-bars"></i>
+        </button>
+        <ul class="nav-list" id="navList">
+          <li><a href="#menuSection">Menu</a></li>
+          <li><a href="#reservation">Reservation</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="header-actions">
+        <button id="themeToggle" class="icon-btn" title="Toggle theme"><i class="fas fa-moon"></i></button>
+        <div class="cart-wrap">
+          <button id="viewCartBtn" class="btn btn-outline" aria-label="View cart">
+            <i class="fas fa-shopping-cart"></i> <span id="cartCount" class="cart-count">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main">
+    <!-- Hero -->
+    <section class="hero" id="home" data-aos="fade-up">
+      <div class="hero-left">
+        <h1>Crafted for Kings and Queen</h1>
+        <p class="lead">Specialty coffee, handcrafted food, and warm hospitality. Order online or reserve a table.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-primary" id="orderNowBtn">Order Now</button>
+          <a href="#reservation" class="btn btn-outline">Reserve a Table</a>
+        </div>
+      </div>
+      <div class="hero-right" data-aos="fade-left">
+        <img src="assets/caleb cafe logo.jpg" alt="Coffee" class="hero-img">
+      </div>
+    </section>
+
+    <div class="auth-container">
+  
+
+
+    <!-- Filters -->
+    <section class="filters" data-aos="fade-up">
+      <div class="filter-controls">
+        <input id="searchInput" type="search" placeholder="Search menu (eg. Jollof Rice, Suya)" aria-label="Search menu">
+        <div class="category-list" id="categoryList">
+          <button class="cat-btn active" data-cat="all">All</button>
+          <button class="cat-btn" data-cat="Pepper Soup">Pepper Soup</button>
+          <button class="cat-btn" data-cat="Suya">Suya</button>
+          <button class="cat-btn" data-cat="Fried Rice">Fried Rice</button>
+          <button class="cat-btn" data-cat="Jollof Rice">Jollof Rice</button>
+          <button class="cat-btn" data-cat="Pounded Yam & Egusi">Pounded Yam & Egusi</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Menu Section – Nigerian Dishes -->
+<section id="menuSection" class="menu-section" data-aos="fade-up">
+  <h2 class="section-title">Our Nigerian Delicacies</h2>
+
+  <div class="menu-grid" id="menuGrid">
+    <!-- Jollof Rice -->
+    <div class="menu-item" data-cat="Jollof Rice">
+      <img class="food-image" src="https://t4.ftcdn.net/jpg/12/92/81/49/240_F_1292814964_cINtJDBFzTcfhlSAKtprK3erb0ltmRSM.jpg" alt="Jollof Rice">
+      <h3 class="card-title">Jollof Rice</h3>
+      <p class="card-desc">Classic smoky Nigerian Jollof served with fried plantain.</p>
+      <span class="price">₦3,500</span>
+    </div>
+
+    <!-- Fried Rice -->
+    <div class="menu-item" data-cat="Fried Rice">
+      <img class="food-image" src="https://allnigerianfoods.com/wp-content/uploads/fried_rice_recipe.jpg" alt="Fried Rice">
+      <h3 class="card-title">Fried Rice</h3>
+      <p class="card-desc">Colorful fried rice seasoned with vegetables and spices.</p>
+      <span class="price">₦3,800</span>
+    </div>
+
+    <!-- Moi-Moi -->
+    <div class="menu-item" data-cat="Moi-Moi">
+      <img class="food-image" src="https://pulses.org/images/com_yoorecipe/422/cropped-moi-moi-rollup.jpg" alt="Moi Moi">
+      <h3 class="card-title">Moi-Moi</h3>
+      <p class="card-desc">Steamed bean pudding with egg and fish filling.</p>
+      <span class="price">₦1,200</span>
+    </div>
+
+    <!-- Pounded Yam & Egusi -->
+    <div class="menu-item" data-cat="Pounded Yam & Egusi">
+      <img class="food-image" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL3Y-wbiDaGu9Aj3-x13vRQEsh-kS62yXOKQ&s" alt="Pounded Yam & Egusi">
+      <h3 class="card-title">Pounded Yam & Egusi</h3>
+      <p class="card-desc">Soft pounded yam paired with rich egusi soup.</p>
+      <span class="price">₦4,500</span>
+    </div>
+
+    <!-- Suya -->
+    <div class="menu-item" data-cat="Suya">
+      <img class="food-image" src="https://theafrikanstore.com/cdn/shop/articles/Suya_61132cc9-4e06-48b9-b4cf-0d975e79b67b_460x@2x.jpg?v=1688103586" alt="Suya">
+      <h3 class="card-title">Suya</h3>
+      <p class="card-desc">Perfectly spiced grilled beef kebab with onions and pepper.</p>
+      <span class="price">₦2,000</span>
+    </div>
+
+    <!-- Pepper Soup -->
+    <div class="menu-item" data-cat="Pepper Soup">
+      <img class="food-image" src="https://images.squarespace-cdn.com/content/v1/614f831e90f08045038b4dae/aee89930-fe76-47c8-84b0-8b9e392d8989/pepper-soup-goat-meat.jpeg" alt="Pepper Soup">
+      <h3 class="card-title">Pepper Soup</h3>
+      <p class="card-desc">Hot and spicy broth cooked with assorted meats.</p>
+      <span class="price">₦2,800</span>
+    </div>
+
+    <!-- Amala & Ewedu -->
+    <div class="menu-item" data-cat="Amala & Ewedu">
+      <img class="food-image" src="https://yummieliciouz.com/wp-content/uploads/2023/11/ewedu-soup-1024x683.webp" alt="Amala & Ewedu">
+      <h3 class="card-title">Amala & Ewedu</h3>
+      <p class="card-desc">Traditional Yoruba delicacy served with gbegiri.</p>
+      <span class="price">₦3,200</span>
+    </div>
+
+    <!-- Akara -->
+    <div class="menu-item" data-cat="Akara">
+      <img class="food-image" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSDVxKmtJfeWoY_2Cg6H7gR-zYHPR2OU1MAAv6aAjjLew&s=10" alt="Akara">
+      <h3 class="card-title">Akara</h3>
+      <p class="card-desc">Crispy bean cakes, perfect for breakfast.</p>
+      <span class="price">₦800</span>
+    </div>
+
+    <!-- Ogbono Soup And Eba -->
+    <div class="menu-item" data-cat="Ogbono Soup and Eba">
+      <img class="food-image" src="Ogbono Soup and Eba image.jpeg" alt="Ogbono Soup and Eba">
+      <h3 class="card-title">Ogbono Soup And Eba</h3>
+      <p class="card-desc">Traditional Igbo delicacy served.</p>
+      <span class="price">₦3,000</span>
+    </div>
+
+  </div>
+</section>
+
+
+    <!-- Reservation -->
+    <section id="reservation" class="reservation" data-aos="fade-up">
+      <h2>Reserve a Table</h2>
+      <p class="muted">Book a table in advance — we'll hold it for you.</p>
+      <form id="reservationForm" novalidate>
+        <div class="form-row">
+          <label for="rname">Full name</label>
+          <input id="rname" name="name" type="text" required>
+          <small class="error" id="err-name"></small>
+        </div>
+        <div class="form-row">
+          <label for="rphone">Phone</label>
+          <input id="rphone" name="phone" type="tel" required pattern="\\d{7,15}">
+          <small class="error" id="err-phone"></small>
+        </div>
+        <div class="form-row">
+          <label for="remail">Email (optional)</label>
+          <input id="remail" name="email" type="email">
+          <small class="error" id="err-email"></small>
+        </div>
+        <div class="form-row grid-2">
+          <div>
+            <label for="rdate">Date</label>
+            <input id="rdate" name="date" type="date" required>
+            <small class="error" id="err-date"></small>
+          </div>
+          <div>
+            <label for="rtime">Time</label>
+            <input id="rtime" name="time" type="time" required>
+            <small class="error" id="err-time"></small>
+          </div>
+        </div>
+        <div class="form-row">
+          <label for="rguests">Guests</label>
+          <input id="rguests" name="guests" type="number" min="1" max="20" value="2" required>
+          <small class="error" id="err-guests"></small>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Confirm Reservation</button>
+          <button type="reset" class="btn btn-outline">Reset</button>
+        </div>
+      </form>
+    </section>
+
+    <div class="form">
+      <h2>Login Here</h2>
+      <input type="email" name="email"  placeholder="Enter Email Here">
+      <input type="password" name="password" placeholder="Enter Password Here">
+      <button class="btn"><a href="#">Login</a></button>
+
+      <p class="link">Don't have an account</p><br>
+      <a href="#">Sign up here</a>
+      <p class="liw">Log in with</p>
+
+    </div>
+
+</div>
+
+<a href="https://wa.me/2347042702052?text=Hello%20Caleb%20Royale%20Cafe!%20I%20would%20like%20to%20make%20a%20reservation%20or%20place%20an%20order."
+   class="whatsapp-btn"
+   target="_blank">
+   <i class="fab fa-whatsapp"></i>
+</a>
+
+    <!-- About -->
+    <section id="about" class="about" data-aos="fade-up">
+      <h2>About Caleb Royale Cafe</h2>
+      <p class="muted">We are a neighbourhood cafe serving specialty coffee and simple, honest food with seasonal ingredients.</p>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer id="contact" class="site-footer" data-aos="fade-up">
+    <div class="container footer-inner">
+      <div class="col">
+        <img src="assets/caleb cafe logo.jpg" alt="Cafe Aurora" class="logo-sm">
+        <p class="muted">Fresh flavors, cozy vibes — visit or order online.</p>
+      </div>
+      <div class="col">
+        <h4>Contact</h4>
+        <p>📞 070 4270 2052 | 0915 228 0890 </p>
+        <p>✉️ info@calebroyalecafe.com</p>
+      </div>
+      <div class="col">
+        <h4>Follow</h4>
+        <div class="socials">
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="copyright">© <span id="year"></span> Caleb Royale Cafe — All rights reserved.</div>
+  </footer>
+
+  <!-- Cart modal -->
+  <div id="cartModal" class="modal" aria-hidden="true" role="dialog" aria-labelledby="cartTitle">
+    <div class="modal-content">
+      <header class="modal-header">
+        <h2 id="cartTitle">Your Order</h2>
+        <button id="closeCart" class="close-btn" aria-label="Close cart">✕</button>
+      </header>
+
+      <div class="modal-body">
+        <ul id="cartList" class="cart-list"></ul>
+
+        <div class="cart-summary">
+          <div>Subtotal</div>
+          <div id="subtotal">₦0</div>
+        </div>
+
+        <div class="cart-actions">
+          <button id="clearCart" class="btn btn-outline">Clear</button>
+          <button id="checkoutBtn" class="btn btn-primary">Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" aria-hidden="true"></div>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    AOS.init({duration:700, once:true, offset:120});
+  </script>
+</body>
+</html>
