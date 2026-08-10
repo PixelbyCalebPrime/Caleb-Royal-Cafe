@@ -1,5 +1,30 @@
-     /* app.js - upgraded features: filtering, cart, theme, reservation validation, animations */
+     /* app.js - upgraded features: filtering, cart, theme, reservation validation, animations, backend integration */
 document.addEventListener('DOMContentLoaded', function () {
+
+  // ---------- Backend config ----------
+  const API_BASE = 'http://localhost:4000/api';
+
+  function getToken(){ return localStorage.getItem('authToken'); }
+  function setToken(t){ localStorage.setItem('authToken', t); }
+  function clearToken(){ localStorage.removeItem('authToken'); }
+  function getAccount(){ try{ return JSON.parse(localStorage.getItem('authUser')); }catch(e){ return null; } }
+  function setAccount(u){ localStorage.setItem('authUser', JSON.stringify(u)); }
+  function clearAccount(){ localStorage.removeItem('authUser'); }
+
+  async function apiFetch(path, options = {}){
+    const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+    const token = getToken();
+    if(token) headers['Authorization'] = 'Bearer ' + token;
+    let res, data;
+    try{
+      res = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
+      data = await res.json().catch(()=> ({}));
+    } catch(err){
+      throw new Error('Cannot reach the server. Is the backend running on http://localhost:4000?');
+    }
+    if(!res.ok) throw new Error(data.error || 'Something went wrong.');
+    return data;
+  }
 
   // ---------- Data ----------
 
@@ -9,72 +34,81 @@ document.addEventListener('DOMContentLoaded', function () {
       id: 'j1',
       title: 'Jollof Rice',
       desc: 'Classic smoky Nigerian Jollof served with fried plantain.',
-      category: 'jollof',
+      category: 'Jollof Rice',
       price: 3500,
-      img: 'https://t4.ftcdn.net/jpg/12/92/81/49/240_F_1292814964_cINtJDBFzTcfhlSAKtprK3erb0ltmRSM.jpg'
+      img: 'assets/Jollof%20Rice%20image.jpg'
     },
 
     {
       id: 'f1',
       title: 'Fried Rice',
       desc: 'Colorful fried rice seasoned with vegetables and spices.',
-      category: 'fried',
+      category: 'Fried Rice',
       price: 3800,
-      img: 'https://allnigerianfoods.com/wp-content/uploads/fried_rice_recipe.jpg'
+      img: 'assets/Fried%20Rice%20image.jpg'
     },
 
     {
       id: 'm1',
       title: 'Moi Moi',
       desc: 'Steamed bean pudding with egg and fish filling.',
-      category: 'moi',
+      category: 'Moi-Moi',
       price: 1200,
-      img: 'https://pulses.org/images/com_yoorecipe/422/cropped-moi-moi-rollup.jpg'
+      img: 'assets/Moi%20Moi%20image.jpg'
     },
 
     {
       id: 'p1',
       title: 'Pounded Yam & Egusi',
       desc: 'Soft pounded yam paired with rich egusi soup.',
-      category: 'pounded',
+      category: 'Pounded Yam & Egusi',
       price: 4500,
-      img: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL3Y-wbiDaGu9Aj3-x13vRQEsh-kS62yXOKQ&s'
+      img: 'assets/Pounded%20Yam%20And%20Egusi%20Soup.jpg'
     },
 
     {
       id: 's1',
       title: 'Suya',
       desc: 'Perfectly spiced grilled beef kebab with onions and pepper.',
-      category: 'suya',
+      category: 'Suya',
       price: 2000,
-      img: 'https://theafrikanstore.com/cdn/shop/articles/Suya_61132cc9-4e06-48b9-b4cf-0d975e79b67b_460x@2x.jpg?v=1688103586'
+      img: 'assets/Suya%20image.jpg'
     },
 
     {
       id: 'ps1',
       title: 'Pepper Soup',
       desc: 'Hot and spicy broth cooked with assorted meats.',
-      category: 'pepper',
+      category: 'Pepper Soup',
       price: 2800,
-      img: 'https://images.squarespace-cdn.com/content/v1/614f831e90f08045038b4dae/aee89930-fe76-47c8-84b0-8b9e392d8989/pepper-soup-goat-meat.jpeg'
+      img: 'assets/Pepper%20Soup%20image.jpg'
     },
 
     {
       id: 'a1',
       title: 'Amala & Ewedu',
       desc: 'Traditional Yoruba delicacy served with gbegiri.',
-      category: 'amala',
+      category: 'Amala & Ewedu',
       price: 3200,
-      img: 'https://yummieliciouz.com/wp-content/uploads/2023/11/ewedu-soup-1024x683.webp'
+      img: 'assets/Amala%20And%20Ewedu%20image.jpg'
     },
 
     {
       id: 'ak1',
       title: 'Akara',
       desc: 'Crispy bean cakes perfect for breakfast.',
-      category: 'akara',
+      category: 'Akara',
       price: 800,
-      img: 'Akara image.jpeg'
+      img: 'assets/Akara%20image.jpeg'
+    },
+
+    {
+      id: 'og1',
+      title: 'Ogbono Soup And Eba',
+      desc: 'Traditional Igbo delicacy served.',
+      category: 'Ogbono Soup and Eba',
+      price: 3000,
+      img: 'assets/Ogbono%20Soup%20and%20Eba%20Image.jpeg'
     }
 
   ];
@@ -111,35 +145,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
   // ---------- Utilities ----------
 
-  function formatNGN(n) {
-    return '₦' + new Intl.NumberFormat().format(n);
-  }
-
-  function showToast(msg) {
-
-    toast.textContent = msg;
-
-    toast.style.display = 'block';
-
-    toast.setAttribute(
-      'aria-hidden',
-      'false'
-    );
-
-    setTimeout(() => {
-
-      toast.style.display = 'none';
-
-      toast.setAttribute(
-        'aria-hidden',
-        'true'
-      );
-
-    }, 2000);
-
-  }
-
-  // ---------- Utilities ----------
   function formatNGN(n){ return '₦' + new Intl.NumberFormat().format(n); }
   function showToast(msg){ toast.textContent = msg; toast.style.display='block'; toast.setAttribute('aria-hidden','false'); setTimeout(()=>{ toast.style.display='none'; toast.setAttribute('aria-hidden','true'); },2000); }
 
@@ -247,11 +252,31 @@ document.addEventListener('DOMContentLoaded', function () {
   function removeItem(id){ delete cart[id]; updateCartUI(); }
   function clearCart(){ cart = {}; updateCartUI(); }
   clearCartBtn.addEventListener('click', ()=>{ clearCart(); showToast('Cart cleared'); });
-  checkoutBtn.addEventListener('click', ()=> {
+  checkoutBtn.addEventListener('click', async () => {
     if(Object.keys(cart).length === 0){ showToast('Your cart is empty'); return; }
-    showToast('Checkout successful — thank you!');
-    clearCart();
-    cartModal.setAttribute('aria-hidden','true');
+
+    const account = getAccount();
+    let customerName = account ? account.name : '';
+    let customerEmail = account ? account.email : '';
+
+    if(!customerName){
+      customerName = window.prompt('Name for this order:') || '';
+      if(!customerName.trim()){ showToast('Order cancelled — a name is required'); return; }
+    }
+
+    const items = Object.values(cart).map(c => ({ id: c.item.id, title: c.item.title, price: c.item.price, qty: c.qty }));
+
+    try{
+      const data = await apiFetch('/orders', {
+        method: 'POST',
+        body: JSON.stringify({ items, customerName, customerEmail })
+      });
+      showToast(data.message || 'Checkout successful — thank you!');
+      clearCart();
+      cartModal.setAttribute('aria-hidden','true');
+    } catch(err){
+      showToast(err.message);
+    }
   });
   viewCartBtn.addEventListener('click', ()=>{ cartModal.setAttribute('aria-hidden','false'); updateCartUI(); });
   closeCartBtn.addEventListener('click', ()=> cartModal.setAttribute('aria-hidden','true'));
@@ -261,18 +286,23 @@ document.addEventListener('DOMContentLoaded', function () {
   navToggle.addEventListener('click', ()=> navList.classList.toggle('show'));
 
   // ---------- Theme toggle ----------
-  function setTheme(theme){
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    themeToggle.innerHTML = theme === 'dark' ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+  if (themeToggle) {
+    function setTheme(theme){
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+      const icon = document.getElementById('themeIcon');
+      if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    const savedTheme = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    setTheme(savedTheme);
+    themeToggle.addEventListener('click', ()=> setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
+  } else {
+    console.warn('themeToggle button not found in the page — check that #themeToggle exists in index.html');
   }
-  const savedTheme = localStorage.getItem('theme') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-  setTheme(savedTheme);
-  themeToggle.addEventListener('click', ()=> setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'));
 
-  // ---------- Reservation form validation ----------
+  // ---------- Reservation form validation + submission ----------
   const reservationForm = document.getElementById('reservationForm');
-  reservationForm.addEventListener('submit', function(e){
+  reservationForm.addEventListener('submit', async function(e){
     e.preventDefault();
     let ok = true;
     // simple validators
@@ -288,9 +318,143 @@ document.addEventListener('DOMContentLoaded', function () {
     if(!time.value){ document.getElementById('err-time').textContent='Select a time'; ok=false; }
     if(!guests.value || Number(guests.value) < 1){ document.getElementById('err-guests').textContent='Enter number of guests'; ok=false; }
     if(!ok){ showToast('Please fix the form errors'); return; }
-    // simulate success
-    showToast('Reservation confirmed — we look forward to seeing you!');
-    reservationForm.reset();
+
+    try{
+      const data = await apiFetch('/reservations', {
+        method: 'POST',
+        body: JSON.stringify({
+          name: name.value.trim(),
+          email: email.value.trim() || undefined,
+          phone: phone.value.trim(),
+          date: date.value,
+          time: time.value,
+          guests: Number(guests.value)
+        })
+      });
+      showToast(data.message || 'Reservation confirmed!');
+      reservationForm.reset();
+    } catch(err){
+      showToast(err.message);
+    }
+  });
+
+  // ---------- Login / Signup (real accounts via backend) ----------
+  const authTitle = document.getElementById('authTitle');
+  const signupNameInput = document.getElementById('signupName');
+  const authEmailInput = document.getElementById('authEmail');
+  const authPasswordInput = document.getElementById('authPassword');
+  const authSubmitBtn = document.getElementById('authSubmitBtn');
+  const authToggleText = document.getElementById('authToggleText');
+  const authToggleLink = document.getElementById('authToggleLink');
+  const authForm = document.getElementById('authForm');
+  const accountPanel = document.getElementById('accountPanel');
+  const accountNameEl = document.getElementById('accountName');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const viewOrdersBtn = document.getElementById('viewOrdersBtn');
+  const orderHistoryList = document.getElementById('orderHistoryList');
+
+  let authMode = 'login'; // or 'signup'
+
+  function renderAuthUI(){
+    const account = getAccount();
+    if(account){
+      authForm.style.display = 'none';
+      accountPanel.style.display = 'block';
+      accountNameEl.textContent = account.name;
+    } else {
+      authForm.style.display = 'block';
+      accountPanel.style.display = 'none';
+    }
+  }
+
+  authToggleLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    authMode = authMode === 'login' ? 'signup' : 'login';
+    if(authMode === 'signup'){
+      authTitle.textContent = 'Create an Account';
+      signupNameInput.style.display = 'block';
+      authSubmitBtn.textContent = 'Sign Up';
+      authToggleText.textContent = 'Already have an account?';
+      authToggleLink.textContent = 'Log in here';
+    } else {
+      authTitle.textContent = 'Login Here';
+      signupNameInput.style.display = 'none';
+      authSubmitBtn.textContent = 'Login';
+      authToggleText.textContent = "Don't have an account?";
+      authToggleLink.textContent = 'Sign up here';
+    }
+  });
+
+  authSubmitBtn.addEventListener('click', async () => {
+    const email = authEmailInput.value.trim();
+    const password = authPasswordInput.value;
+    if(!email || !password){ showToast('Please enter your email and password'); return; }
+
+    try{
+      let data;
+      if(authMode === 'signup'){
+        const name = signupNameInput.value.trim();
+        if(!name){ showToast('Please enter your name'); return; }
+        data = await apiFetch('/auth/signup', { method:'POST', body: JSON.stringify({ name, email, password }) });
+      } else {
+        data = await apiFetch('/auth/login', { method:'POST', body: JSON.stringify({ email, password }) });
+      }
+      setToken(data.token);
+      setAccount(data.user);
+      renderAuthUI();
+      showToast(`Welcome, ${data.user.name}!`);
+      authEmailInput.value = ''; authPasswordInput.value = ''; signupNameInput.value = '';
+    } catch(err){
+      showToast(err.message);
+    }
+  });
+
+  logoutBtn.addEventListener('click', () => {
+    clearToken();
+    clearAccount();
+    renderAuthUI();
+    orderHistoryList.innerHTML = '';
+    showToast('Logged out');
+  });
+
+  viewOrdersBtn.addEventListener('click', async () => {
+    try{
+      const data = await apiFetch('/orders/mine');
+      orderHistoryList.innerHTML = '';
+      if(data.orders.length === 0){
+        orderHistoryList.innerHTML = '<li>No orders yet.</li>';
+        return;
+      }
+      data.orders.forEach(o => {
+        const li = document.createElement('li');
+        li.className = 'cart-row';
+        const itemsText = o.items.map(i => `${i.title} x${i.qty}`).join(', ');
+        li.innerHTML = `<div class="row-left"><div style="font-weight:600">${itemsText}</div><div style="color:var(--muted); font-size:13px">${o.created_at}</div></div><div class="row-right">${formatNGN(o.subtotal)}</div>`;
+        orderHistoryList.appendChild(li);
+      });
+    } catch(err){
+      showToast(err.message);
+    }
+  });
+
+  renderAuthUI();
+
+  // ---------- Contact form ----------
+  const contactSubmitBtn = document.getElementById('contactSubmitBtn');
+  contactSubmitBtn.addEventListener('click', async () => {
+    const name = document.getElementById('contactName').value.trim();
+    const email = document.getElementById('contactEmail').value.trim();
+    const message = document.getElementById('contactMessage').value.trim();
+    if(!name || !email || !message){ showToast('Please fill in all fields'); return; }
+    try{
+      const data = await apiFetch('/contact', { method:'POST', body: JSON.stringify({ name, email, message }) });
+      showToast(data.message);
+      document.getElementById('contactName').value = '';
+      document.getElementById('contactEmail').value = '';
+      document.getElementById('contactMessage').value = '';
+    } catch(err){
+      showToast(err.message);
+    }
   });
 
   // ---------- Init ----------
