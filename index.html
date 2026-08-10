@@ -13,7 +13,7 @@
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
   <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" integrity="sha512-..." crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <link rel="stylesheet" href="css/styles.css" />
 </head>
@@ -26,7 +26,7 @@
 
       <nav class="nav" id="navbar">
         <button class="nav-toggle" id="navToggle" aria-label="Toggle navigation">
-          <i class="fas fa-bars"></i>
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         <ul class="nav-list" id="navList">
           <li><a href="#menuSection">Menu</a></li>
@@ -37,10 +37,13 @@
       </nav>
 
       <div class="header-actions">
-        <button id="themeToggle" class="icon-btn" title="Toggle theme"><i class="fas fa-moon"></i></button>
+        <button id="themeToggle" class="icon-btn" title="Toggle theme">
+          <span id="themeIcon">🌙</span>
+        </button>
         <div class="cart-wrap">
           <button id="viewCartBtn" class="btn btn-outline" aria-label="View cart">
-            <i class="fas fa-shopping-cart"></i> <span id="cartCount" class="cart-count">0</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+            <span id="cartCount" class="cart-count">0</span>
           </button>
         </div>
       </div>
@@ -73,11 +76,15 @@
         <input id="searchInput" type="search" placeholder="Search menu (eg. Jollof Rice, Suya)" aria-label="Search menu">
         <div class="category-list" id="categoryList">
           <button class="cat-btn active" data-cat="all">All</button>
-          <button class="cat-btn" data-cat="Pepper Soup">Pepper Soup</button>
-          <button class="cat-btn" data-cat="Suya">Suya</button>
-          <button class="cat-btn" data-cat="Fried Rice">Fried Rice</button>
           <button class="cat-btn" data-cat="Jollof Rice">Jollof Rice</button>
+          <button class="cat-btn" data-cat="Fried Rice">Fried Rice</button>
+          <button class="cat-btn" data-cat="Moi-Moi">Moi-Moi</button>
           <button class="cat-btn" data-cat="Pounded Yam & Egusi">Pounded Yam & Egusi</button>
+          <button class="cat-btn" data-cat="Suya">Suya</button>
+          <button class="cat-btn" data-cat="Pepper Soup">Pepper Soup</button>
+          <button class="cat-btn" data-cat="Amala & Ewedu">Amala & Ewedu</button>
+          <button class="cat-btn" data-cat="Akara">Akara</button>
+          <button class="cat-btn" data-cat="Ogbono Soup and Eba">Ogbono Soup and Eba</button>
         </div>
       </div>
     </section>
@@ -175,7 +182,7 @@
         </div>
         <div class="form-row">
           <label for="rphone">Phone</label>
-          <input id="rphone" name="phone" type="tel" required pattern="\\d{7,15}">
+          <input id="rphone" name="phone" type="tel" required pattern="\d{7,15}">
           <small class="error" id="err-phone"></small>
         </div>
         <div class="form-row">
@@ -208,30 +215,92 @@
       </form>
     </section>
 
-    <div class="form">
-      <h2>Login Here</h2>
-      <input type="email" name="email"  placeholder="Enter Email Here">
-      <input type="password" name="password" placeholder="Enter Password Here">
-      <button class="btn"><a href="#">Login</a></button>
+    <section id="accountSection" class="form-section" data-aos="fade-up">
+      <div class="form" id="authForm">
+        <h2 id="authTitle">Login Here</h2>
 
-      <p class="link">Don't have an account</p><br>
-      <a href="#">Sign up here</a>
-      <p class="liw">Log in with</p>
+        <input id="signupName" type="text" name="name" placeholder="Full Name" style="display:none">
+        <input id="authEmail" type="email" name="email" placeholder="Enter Email Here">
+        <input id="authPassword" type="password" name="password" placeholder="Enter Password Here">
 
-    </div>
+        <button id="authSubmitBtn" class="btn" type="button">Login</button>
+
+        <p class="link" id="authToggleText">Don't have an account?</p><br>
+        <a id="authToggleLink" href="#">Sign up here</a>
+      </div>
+
+      <div class="form" id="accountPanel" style="display:none">
+        <h2>Welcome, <span id="accountName"></span></h2>
+        <p class="muted">You're logged in.</p>
+        <button id="viewOrdersBtn" class="btn btn-outline" type="button">My Order History</button>
+        <button id="logoutBtn" class="btn" type="button">Logout</button>
+        <ul id="orderHistoryList" class="cart-list"></ul>
+      </div>
+    </section>
+
+    <section id="contactFormSection" class="form-section" data-aos="fade-up">
+      <div class="form" id="contactForm">
+        <h2>Send Us a Message</h2>
+        <input id="contactName" type="text" name="name" placeholder="Your Name">
+        <input id="contactEmail" type="email" name="email" placeholder="Your Email">
+        <textarea id="contactMessage" name="message" placeholder="Your Message" rows="4" style="width:100%;padding:10px;border-radius:8px;margin-top:10px;"></textarea>
+        <button id="contactSubmitBtn" class="btn btn-primary" type="button" style="margin-top:10px;">Send Message</button>
+      </div>
+    </section>
 
 </div>
 
 <a href="https://wa.me/2347042702052?text=Hello%20Caleb%20Royale%20Cafe!%20I%20would%20like%20to%20make%20a%20reservation%20or%20place%20an%20order."
    class="whatsapp-btn"
-   target="_blank">
-   <i class="fab fa-whatsapp"></i>
+   target="_blank"
+   aria-label="Chat on WhatsApp">
+   <svg viewBox="0 0 32 32" width="28" height="28" fill="currentColor"><path d="M16 2C8.3 2 2 8.3 2 16c0 2.6.7 5.1 2 7.3L2 30l6.9-1.8c2.1 1.2 4.6 1.8 7.1 1.8 7.7 0 14-6.3 14-14S23.7 2 16 2zm0 25.5c-2.2 0-4.4-.6-6.3-1.7l-.4-.3-4.1 1.1 1.1-4-.3-.4C4.7 20.3 4 18.2 4 16 4 9.4 9.4 4 16 4s12 5.4 12 12-5.4 11.5-12 11.5zm6.6-8.9c-.4-.2-2.1-1-2.4-1.2-.3-.1-.6-.2-.8.2-.2.4-.9 1.2-1.1 1.4-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3-1.9-1.1-1-1.9-2.2-2.1-2.6-.2-.4 0-.6.2-.8.2-.2.4-.4.5-.6.2-.2.2-.4.4-.6.1-.2.1-.4 0-.6-.1-.2-.8-2-1.1-2.7-.3-.7-.6-.6-.8-.6h-.7c-.2 0-.6.1-.9.4-.3.4-1.2 1.2-1.2 2.8 0 1.6 1.2 3.2 1.4 3.4.2.2 2.4 3.7 5.8 5.1.8.3 1.4.5 1.9.7.8.2 1.5.2 2.1.1.6-.1 2.1-.8 2.3-1.7.3-.8.3-1.5.2-1.7-.1-.1-.3-.2-.7-.4z"/></svg>
 </a>
 
     <!-- About -->
     <section id="about" class="about" data-aos="fade-up">
       <h2>About Caleb Royale Cafe</h2>
-      <p class="muted">We are a neighbourhood cafe serving specialty coffee and simple, honest food with seasonal ingredients.</p>
+
+      <h5>
+        <i>
+      <p class="muted">Welcome to Royale Cafe, a warm and welcoming neighbourhood cafe created
+    for people who appreciate great food, quality coffee, and beautiful
+    moments. We are passionate about providing our customers with a
+    comfortable place where they can relax, connect with friends and family,
+    work, study, or simply enjoy a delicious meal.</p>
+
+    <p>
+    At Royale Cafe, we believe that good food should be fresh, delicious,
+    and prepared with care. Our menu features a carefully selected range of
+    specialty coffees, refreshing drinks, tasty meals, light snacks, and
+    delightful treats made to satisfy different tastes and preferences.
+    We carefully select our ingredients and prepare every order with
+    attention to quality and presentation.
+</p>
+
+<p>
+    More than just a place to eat and drink, Royale Cafe is a place where
+    people come together. Whether you are stopping by for your morning
+    coffee, having lunch with friends, meeting someone special, working on
+    an important project, or enjoying a quiet evening, our goal is to make
+    every visit comfortable and memorable.
+</p>
+
+<p>
+    Our team is committed to providing friendly service and making every
+    customer feel valued. From the moment you walk through our doors to the
+    moment you leave, we want you to experience the welcoming atmosphere,
+    quality service, and delicious flavours that make Royale Cafe special.
+</p>
+
+<p>
+    Thank you for choosing Royale Cafe. We look forward to serving you,
+    creating memorable experiences, and becoming your favourite place for
+    fresh flavours, great coffee, and wonderful moments.
+</p>
+</i>
+</h5>
+
     </section>
 
   </main>
@@ -251,9 +320,9 @@
       <div class="col">
         <h4>Follow</h4>
         <div class="socials">
-          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="Facebook"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12z"/></svg></a>
+          <a href="#" aria-label="Twitter"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 5.9c-.7.3-1.5.6-2.3.7.8-.5 1.5-1.3 1.8-2.3-.8.5-1.7.8-2.6 1a4.1 4.1 0 0 0-7 3.7A11.7 11.7 0 0 1 3.4 4.8a4.1 4.1 0 0 0 1.3 5.5c-.7 0-1.3-.2-1.9-.5v.1c0 2 1.4 3.6 3.3 4a4.2 4.2 0 0 1-1.9.1 4.1 4.1 0 0 0 3.8 2.9A8.3 8.3 0 0 1 2 18.6a11.6 11.6 0 0 0 6.3 1.9c7.5 0 11.7-6.3 11.7-11.7v-.5c.8-.6 1.5-1.3 2-2.1z"/></svg></a>
+          <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2.2c3.2 0 3.6 0 4.8.1 1.2 0 1.9.2 2.4.4.6.2 1 .5 1.5.9.4.4.7.9.9 1.5.2.5.3 1.2.4 2.4.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c0 1.2-.2 1.9-.4 2.4-.2.6-.5 1-.9 1.5-.4.4-.9.7-1.5.9-.5.2-1.2.3-2.4.4-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2 0-1.9-.2-2.4-.4-.6-.2-1-.5-1.5-.9-.4-.4-.7-.9-.9-1.5-.2-.5-.3-1.2-.4-2.4C2.2 15.6 2.2 15.2 2.2 12s0-3.6.1-4.8c0-1.2.2-1.9.4-2.4.2-.6.5-1 .9-1.5.4-.4.9-.7 1.5-.9.5-.2 1.2-.3 2.4-.4C8.4 2.2 8.8 2.2 12 2.2zm0 1.8c-3.1 0-3.5 0-4.7.1-1 0-1.5.2-1.9.3-.5.2-.8.4-1.1.7-.3.3-.5.6-.7 1.1-.1.4-.3.9-.3 1.9-.1 1.2-.1 1.6-.1 4.7s0 3.5.1 4.7c0 1 .2 1.5.3 1.9.2.5.4.8.7 1.1.3.3.6.5 1.1.7.4.1.9.3 1.9.3 1.2.1 1.6.1 4.7.1s3.5 0 4.7-.1c1 0 1.5-.2 1.9-.3.5-.2.8-.4 1.1-.7.3-.3.5-.6.7-1.1.1-.4.3-.9.3-1.9.1-1.2.1-1.6.1-4.7s0-3.5-.1-4.7c0-1-.2-1.5-.3-1.9-.2-.5-.4-.8-.7-1.1-.3-.3-.6-.5-1.1-.7-.4-.1-.9-.3-1.9-.3-1.2-.1-1.6-.1-4.7-.1zm0 3a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 1.8a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4zm5.2-2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4z"/></svg></a>
         </div>
       </div>
     </div>

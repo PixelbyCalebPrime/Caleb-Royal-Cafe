@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard — Caleb Royal Cafe</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    body{ background:var(--bg); color:var(--accent); font-family:Inter, system-ui, sans-serif; margin:0; }
+    .admin-wrap{ max-width:1100px; margin:0 auto; padding:24px 16px 60px; }
+    .admin-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+    .admin-header h1{ font-family:Montserrat, sans-serif; font-size:22px; margin:0; }
+    #loginPanel{ max-width:360px; margin:60px auto; background:var(--card); padding:24px; border-radius:var(--radius); box-shadow:var(--shadow); }
+    #loginPanel input{ width:100%; padding:10px; margin-top:10px; border-radius:8px; border:1px solid #ddd; box-sizing:border-box; }
+    #loginPanel button{ width:100%; margin-top:14px; padding:10px; border:none; border-radius:8px; background:var(--primary); font-weight:700; cursor:pointer; }
+    #loginError{ color:#c0392b; margin-top:10px; font-size:14px; }
+    .tabs{ display:flex; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+    .tab-btn{ padding:8px 16px; border-radius:20px; border:1px solid #ddd; background:var(--card); cursor:pointer; font-weight:600; }
+    .tab-btn.active{ background:var(--primary); border-color:var(--primary); }
+    table{ width:100%; border-collapse:collapse; background:var(--card); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow); }
+    th, td{ text-align:left; padding:10px 12px; border-bottom:1px solid rgba(0,0,0,0.06); font-size:14px; vertical-align:top; }
+    th{ background:rgba(0,0,0,0.03); }
+    select, .logout-btn{ padding:6px 10px; border-radius:6px; border:1px solid #ddd; }
+    .logout-btn{ cursor:pointer; background:var(--card); }
+    .empty-note{ padding:20px; text-align:center; color:var(--muted); }
+    .pill{ padding:3px 8px; border-radius:12px; font-size:12px; font-weight:700; background:#eee; }
+  </style>
+</head>
+<body>
+
+  <div id="loginPanel">
+    <h2 style="margin-top:0;">Admin Login</h2>
+    <input id="adminEmail" type="email" placeholder="Admin email">
+    <input id="adminPassword" type="password" placeholder="Password">
+    <button id="adminLoginBtn">Login</button>
+    <div id="loginError"></div>
+  </div>
+
+  <div class="admin-wrap" id="dashboard" style="display:none;">
+    <div class="admin-header">
+      <h1>Caleb Royal Cafe — Admin</h1>
+      <button class="logout-btn" id="adminLogoutBtn">Logout</button>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="reservations">Reservations</button>
+      <button class="tab-btn" data-tab="orders">Orders</button>
+      <button class="tab-btn" data-tab="messages">Messages</button>
+      <button class="tab-btn" data-tab="users">Users</button>
+    </div>
+
+    <div id="tabContent"></div>
+  </div>
+
+  <script>
+    const API_BASE = 'http://localhost:4000/api';
+    const loginPanel = document.getElementById('loginPanel');
+    const dashboard = document.getElementById('dashboard');
+    const loginError = document.getElementById('loginError');
+    const tabContent = document.getElementById('tabContent');
+
+    function getToken(){ return localStorage.getItem('adminToken'); }
+    function setToken(t){ localStorage.setItem('adminToken', t); }
+    function clearToken(){ localStorage.removeItem('adminToken'); }
+
+    async function apiFetch(path, options = {}){
+      const headers = Object.assign({ 'Content-Type': 'application/json' }, options.headers || {});
+      const token = getToken();
+      if(token) headers['Authorization'] = 'Bearer ' + token;
+      let res, data;
+      try{
+        res = await fetch(API_BASE + path, Object.assign({}, options, { headers }));
+        data = await res.json().catch(()=> ({}));
+      } catch(err){
+        throw new Error('Cannot reach the server. Is the backend running on http://localhost:4000?');
+      }
+      if(!res.ok) throw new Error(data.error || 'Something went wrong.');
+      return data;
+    }
+
+    function escapeHtml(str){
+      return String(str ?? '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    async function showDashboard(){
+      loginPanel.style.display = 'none';
+      dashboard.style.display = 'block';
+      await loadTab('reservations');
+    }
+
+    document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+      loginError.textContent = '';
+      const email = document.getElementById('adminEmail').value.trim();
+      const password = document.getElementById('adminPassword').value;
+      if(!email || !password){ loginError.textContent = 'Enter email and password'; return; }
+      try{
+        const data = await apiFetch('/auth/login', { method:'POST', body: JSON.stringify({ email, password }) });
+        if(!data.user.isAdmin){
+          loginError.textContent = 'This account is not an admin.';
+          return;
+        }
+        setToken(data.token);
+        showDashboard();
+      } catch(err){
+        loginError.textContent = err.message;
+      }
+    });
+
+    document.getElementById('adminLogoutBtn').addEventListener('click', () => {
+      clearToken();
+      dashboard.style.display = 'none';
+      loginPanel.style.display = 'block';
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        loadTab(btn.dataset.tab);
+      });
+    });
+
+    async function loadTab(tab){
+      tabContent.innerHTML = '<div class="empty-note">Loading…</div>';
+      try{
+        if(tab === 'reservations') return renderReservations(await apiFetch('/admin/reservations'));
+        if(tab === 'orders') return renderOrders(await apiFetch('/admin/orders'));
+        if(tab === 'messages') return renderMessages(await apiFetch('/admin/messages'));
+        if(tab === 'users') return renderUsers(await apiFetch('/admin/users'));
+      } catch(err){
+        tabContent.innerHTML = `<div class="empty-note">${escapeHtml(err.message)}</div>`;
+      }
+    }
+
+    function renderReservations({ reservations }){
+      if(reservations.length === 0){ tabContent.innerHTML = '<div class="empty-note">No reservations yet.</div>'; return; }
+      const statuses = ['pending','confirmed','cancelled'];
+      tabContent.innerHTML = `<table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Date</th><th>Time</th><th>Guests</th><th>Status</th></tr></thead><tbody>
+        ${reservations.map(r => `<tr>
+          <td>${escapeHtml(r.name)}</td>
+          <td>${escapeHtml(r.phone)}</td>
+          <td>${escapeHtml(r.email || '—')}</td>
+          <td>${escapeHtml(r.date)}</td>
+          <td>${escapeHtml(r.time)}</td>
+          <td>${r.guests}</td>
+          <td><select data-id="${r.id}" class="res-status">${statuses.map(s => `<option value="${s}" ${s===r.status?'selected':''}>${s}</option>`).join('')}</select></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+      document.querySelectorAll('.res-status').forEach(sel => {
+        sel.addEventListener('change', async () => {
+          try{
+            await apiFetch(`/admin/reservations/${sel.dataset.id}/status`, { method:'PATCH', body: JSON.stringify({ status: sel.value }) });
+          } catch(err){ alert(err.message); }
+        });
+      });
+    }
+
+    function renderOrders({ orders }){
+      if(orders.length === 0){ tabContent.innerHTML = '<div class="empty-note">No orders yet.</div>'; return; }
+      const statuses = ['received','preparing','ready','completed','cancelled'];
+      tabContent.innerHTML = `<table><thead><tr><th>Customer</th><th>Items</th><th>Subtotal</th><th>Date</th><th>Status</th></tr></thead><tbody>
+        ${orders.map(o => `<tr>
+          <td>${escapeHtml(o.customer_name)}<br><span class="pill">${escapeHtml(o.customer_email || 'no email')}</span></td>
+          <td>${o.items.map(i => `${escapeHtml(i.title)} x${i.qty}`).join('<br>')}</td>
+          <td>₦${new Intl.NumberFormat().format(o.subtotal)}</td>
+          <td>${escapeHtml(o.created_at)}</td>
+          <td><select data-id="${o.id}" class="order-status">${statuses.map(s => `<option value="${s}" ${s===o.status?'selected':''}>${s}</option>`).join('')}</select></td>
+        </tr>`).join('')}
+      </tbody></table>`;
+      document.querySelectorAll('.order-status').forEach(sel => {
+        sel.addEventListener('change', async () => {
+          try{
+            await apiFetch(`/admin/orders/${sel.dataset.id}/status`, { method:'PATCH', body: JSON.stringify({ status: sel.value }) });
+          } catch(err){ alert(err.message); }
+        });
+      });
+    }
+
+    function renderMessages({ messages }){
+      if(messages.length === 0){ tabContent.innerHTML = '<div class="empty-note">No messages yet.</div>'; return; }
+      tabContent.innerHTML = `<table><thead><tr><th>Name</th><th>Email</th><th>Message</th><th>Date</th></tr></thead><tbody>
+        ${messages.map(m => `<tr>
+          <td>${escapeHtml(m.name)}</td>
+          <td>${escapeHtml(m.email)}</td>
+          <td>${escapeHtml(m.message)}</td>
+          <td>${escapeHtml(m.created_at)}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+
+    function renderUsers({ users }){
+      if(users.length === 0){ tabContent.innerHTML = '<div class="empty-note">No users yet.</div>'; return; }
+      tabContent.innerHTML = `<table><thead><tr><th>Name</th><th>Email</th><th>Admin?</th><th>Joined</th></tr></thead><tbody>
+        ${users.map(u => `<tr>
+          <td>${escapeHtml(u.name)}</td>
+          <td>${escapeHtml(u.email)}</td>
+          <td>${u.is_admin ? '<span class="pill">Admin</span>' : '—'}</td>
+          <td>${escapeHtml(u.created_at)}</td>
+        </tr>`).join('')}
+      </tbody></table>`;
+    }
+
+    // Auto-login if we already have a token
+    (async function init(){
+      if(getToken()){
+        try{
+          const data = await apiFetch('/auth/me');
+          if(data.user.isAdmin){ showDashboard(); return; }
+        } catch(err){ /* fall through to login */ }
+        clearToken();
+      }
+    })();
+  </script>
+</body>
+</html>
