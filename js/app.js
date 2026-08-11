@@ -2,7 +2,7 @@
 document.addEventListener('DOMContentLoaded', function () {
 
   // ---------- Backend config ----------
-  const API_BASE = 'http://localhost:4000/api';
+  const API_BASE = 'https://caleb-royale-cafe-backend.onrender.com/api';
 
   function getToken(){ return localStorage.getItem('authToken'); }
   function setToken(t){ localStorage.setItem('authToken', t); }
